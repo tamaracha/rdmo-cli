@@ -4,14 +4,20 @@ const path = require('path')
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
 const shell = require('shelljs')
-const AJV = require('ajv')
+const AJV = require('ajv').default
+const formats = require('ajv-formats')
 const { writeFile } = require('fs/promises')
 const $RefParser = require('@apidevtools/json-schema-ref-parser')
 const schema = require('rdmo-json-schema').schema
 const serialize = require('rdmo-json2xml')
 
 const ajv = new AJV()
-const validate = ajv.compile(schema)
+const validate = ajv.compile(schema, {
+  formats: {
+    uri: formats.get('uri'),
+    'uri-reference': formats.get('uri-reference')
+  }
+})
 
 yargs(hideBin(process.argv))
   .command('validate <project>', 'Validate your project', (yargs) => {
