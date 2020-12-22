@@ -19,16 +19,18 @@
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.6",
     "ajv": "^7.0.2",
-    "husky": "^4.3.6",
-    "lint-staged": "^10.5.3",
-    "prettier": "^2.2.1",
-    "rdmo-json-schema": "github:tamaracha/rdmo-json-schema",
-    "rdmo-json2xml": "github:tamaracha/rdmo-json2xml",
+    "ajv-formats": "^1.5.1",
+    "rdmo-json2xml": "https://github.com/tamaracha/rdmo-json2xml/releases/download/v0.1.0/rdmo-json2xml-0.1.0.tgz",
     "shelljs": "^0.8.4",
-    "snazzy": "^9.0.0",
     "yargs": "^16.2.0"
   },
   "devDependencies": {
+    "husky": "^4.3.6",
+    "lint-staged": "^10.5.3",
+    "markdownlint": "^0.22.0",
+    "markdownlint-cli2": "^0.0.13",
+    "prettier": "^2.2.1",
+    "snazzy": "^9.0.0",
     "standard": "^16.0.3"
   },
   "husky": {
@@ -38,6 +40,7 @@
   },
   "lint-staged": {
     "*.js": "npm run lint --",
+    "*.md": "markdownlint-cli2",
     "*.{yml,yaml,json}": "prettier --write"
   }
 }
