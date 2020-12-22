@@ -23,6 +23,7 @@
     "prettier": "^2.2.1",
     "rdmo-json-schema": "github:tamaracha/rdmo-json-schema",
     "rdmo-json2xml": "github:tamaracha/rdmo-json2xml",
+    "shelljs": "^0.8.4",
     "snazzy": "^9.0.0",
     "yargs": "^16.2.0"
   },
