@@ -18,6 +18,10 @@
   ],
   "author": "Tamara Cook <tamara.cook@uni-marburg.de>",
   "license": "MIT",
+  "private": true,
+  "files": [
+    "bin"
+  ],
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.6",
     "ajv": "^7.0.2",
