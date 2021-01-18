@@ -2,21 +2,25 @@
 'use strict'
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
-const AJV = require('ajv').default
+const AJV = require('ajv/dist/2019').default
 const formats = require('ajv-formats')
 const { dump } = require('js-yaml')
 const $RefParser = require('@apidevtools/json-schema-ref-parser')
 const { schema } = require('@rdmo-author/schema')
 const { write } = require('@rdmo-author/xml')
 
-const ajv = new AJV()
-const validate = ajv.compile(schema, {
+const ajv = new AJV({
   formats: {
     uri: formats.get('uri'),
     'uri-reference': formats.get('uri-reference')
-  },
-  keywords: ['tsType']
+  }
 })
+  .addKeyword({
+    keyword: 'tsType',
+    schemaType: 'string',
+    valid: true
+  })
+const validate = ajv.compile(schema)
 
 yargs(hideBin(process.argv))
   .command('validate <project>', 'Validate your project', (yargs) => {
