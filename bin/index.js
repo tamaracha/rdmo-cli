@@ -1,22 +1,21 @@
 #!/usr/bin/env node
 'use strict'
-const path = require('path')
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
-const shell = require('shelljs')
 const AJV = require('ajv').default
 const formats = require('ajv-formats')
-const { writeFile } = require('fs/promises')
+const { dump } = require('js-yaml')
 const $RefParser = require('@apidevtools/json-schema-ref-parser')
-const schema = require('rdmo-json-schema').schema
-const serialize = require('rdmo-json2xml')
+const { schema } = require('@rdmo-author/schema')
+const { write } = require('@rdmo-author/xml')
 
 const ajv = new AJV()
 const validate = ajv.compile(schema, {
   formats: {
     uri: formats.get('uri'),
     'uri-reference': formats.get('uri-reference')
-  }
+  },
+  keywords: ['tsType']
 })
 
 yargs(hideBin(process.argv))
@@ -44,47 +43,28 @@ yargs(hideBin(process.argv))
       .positional('project', {
         description: 'The root file of your RDMO catalog'
       })
-      .option('domain', {
-        type: 'boolean',
-        description: 'Export the domain of your catalog',
-        default: true
+  }, async (argv) => {
+    const data = await $RefParser.dereference(argv.project, { resolve: { http: false } })
+    await process.stdout.write(write(data))
+  })
+  .command('bundle <project>', 'Bundle a catalog spread over multiple files into one single file', yargs => {
+    yargs
+      .positional('project', {
+        description: 'The root file of your RDMO catalog'
       })
-      .option('options', {
-        type: 'boolean',
-        description: 'Export the optionsets of your catalog',
-        default: true
-      })
-      .option('questions', {
-        type: 'boolean',
-        description: 'Export the questions of your catalog',
-        default: true
-      })
-      .option('out', {
-        alias: 'o',
+      .option('format', {
+        alias: 'f',
         type: 'string',
+        choices: ['json', 'yaml'],
         description: 'Output directory where to write the xml files',
-        default: '.'
+        default: 'json'
       })
   }, async (argv) => {
-    shell.mkdir('-p', argv.out)
-    const data = await $RefParser.dereference(argv.project, { resolve: { http: false } })
-    if (argv.domain === true) {
-      const xml = serialize.domain(data)
-      const filename = path.join(argv.out, 'domain.xml')
-      await writeFile(filename, xml)
-      console.log(`domain written to ${filename}`)
-    }
-    if (argv.options === true) {
-      const xml = serialize.options(data)
-      const filename = path.join(argv.out, 'options.xml')
-      await writeFile(filename, xml)
-      console.log(`options written to ${filename}`)
-    }
-    if (argv.questions === true) {
-      const xml = serialize.questions(data)
-      const filename = path.join(argv.out, 'questions.xml')
-      await writeFile(filename, xml)
-      console.log(`question catalog written to ${filename}`)
+    const data = await $RefParser.bundle(argv.project, { resolve: { http: false } })
+    if (argv.format === 'yaml') {
+      await process.stdout.write(dump(data))
+    } else {
+      await process.stdout.write(JSON.stringify(data, null, 2))
     }
   })
   .parse()
